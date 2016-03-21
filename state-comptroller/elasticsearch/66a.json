@@ -1,0 +1,30 @@
+{
+  "template": "66a",
+  "settings": {
+    "analysis.analyzer": {
+      "default": {
+        "type": "hebrew"
+      },
+      "keyword": {
+        "analyzer": "custom",
+        "tokenizer": "keyword",
+        "filter": "trim"
+      }
+    }
+  },
+  "mappings": {
+    "_default_": {
+      "dynamic_templates": [
+        {
+          "simple_analyzer": {
+            "match_pattern": "regex",
+            "match": "^(sub_type|body)$",
+            "mapping": {
+              "analyzer": "keyword"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
