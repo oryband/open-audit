@@ -4,11 +4,12 @@ Opening auditing data from the [Israeli State Comptroller][website].
 
 ## Code
 
-This directory holds the 2015 yearly report,
-extracted manually from the [State Comptroller's website][website] and dumped into YAML files.
+This directory contains a scraper for the website,
+which fetches all reports and dumps them into JSON.
 
-A CLI Python script can convert these YAML to JSON
-and dump them into Elasticsearch for nice data discovery.
+In addition it contains helper scripts to load these onto an ad-hoc Elasticsearch
+with Hebrew support in a Docker container.
+This is for content exploration and development purposes.
 
 
 [website]: http://www.mevaker.gov.il
