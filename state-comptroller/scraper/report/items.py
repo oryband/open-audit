@@ -41,6 +41,7 @@ class ReportChapter(scrapy.Item):
     id = scrapy.Field()
     source_url = scrapy.Field()
 
+    chapter_num = scrapy.Field()
     title = scrapy.Field()
     offices = scrapy.Field()
     keywords = scrapy.Field()

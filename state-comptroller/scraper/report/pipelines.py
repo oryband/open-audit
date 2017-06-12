@@ -138,6 +138,7 @@ class ReportPipeline(object):
             'id': item['id'],
             'source_url': item['source_url'],
 
+            'chapter_num': item['chapter_num'],
             'title': self.html_parser.unescape(item['title'].strip()),
             'offices': [self.html_parser.unescape(office.strip()) for office in item['offices']],
             'keywords': [self.html_parser.unescape(keyword.strip()) for keyword in item['keywords']],

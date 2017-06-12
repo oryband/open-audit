@@ -214,6 +214,7 @@ class ReportSpider(Spider):
                 id=id,
                 source_url=response.url,
 
+                chapter_num=num,
                 title=title,
                 offices=content.xpath('./div[1]/div[1]/div[2]/ul/li/text()').extract(),
                 keywords=content.xpath('./div[1]/div[2]/div[2]/ul/li/text()').extract(),
