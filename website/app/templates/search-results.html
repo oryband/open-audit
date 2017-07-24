@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block main %}
+
+<div class="main-container">
+  <div class="main wrapper clearfix">
+
+    <article>
+      <section>
+        <h2>חיפוש</h2>
+        <div class="search-results">
+          <ul>
+            {% for result in search_results %}
+            <li>
+              <div>{% result %}</div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    </article>
+
+
+  </div>
+</div>
+
+{% endblock %}
