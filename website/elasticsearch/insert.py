@@ -70,10 +70,10 @@ def topics(es, index_name, dir_path):
             es.create(index_name, doc_type='topic', body=topic)
 
 if __name__ == '__main__':
-    es = Elasticsearch()
+    es = Elasticsearch(hosts=[{'host': sys.argv[1], 'port': int(sys.argv[2])}])
     print('loading prefaces...')
-    prefaces(es, INDEX_NAME, sys.argv[1])
+    prefaces(es, INDEX_NAME, sys.argv[3])
     print('loading chapters...')
-    chapters(es, INDEX_NAME, sys.argv[1])
+    chapters(es, INDEX_NAME, sys.argv[3])
     print('loading topics...')
-    topics(es, INDEX_NAME, sys.argv[1])
+    topics(es, INDEX_NAME, sys.argv[3])

@@ -8,6 +8,34 @@ services:
       - 5000:5000
     volumes:
       - ./app:/code
+    links:
+      - elasticsearch
     environment:
       FLASK_APP: app.py
       FLASK_DEBUG: 1
+
+  load-elasticsearch-data:
+    command: sh -c 'pip install -r /code/requirements.txt && apk add -qU curl && until $$(curl -sfo /dev/null elasticsearch:9200); do sleep 1; done && /code/insert.py elasticsearch 9200 /data'
+    image: python:3-alpine
+    volumes:
+      - ./elasticsearch:/code
+      - ../state-comptroller/scraper/output:/data
+    links:
+      - elasticsearch
+
+  elasticsearch:
+    build: ./elasticsearch/elk-hebmorph-docker/elasticsearch
+    volumes:
+      - ./elasticsearch/elk-hebmorph-docker/elasticsearch/config:/usr/share/elasticsearch/config
+    ports:
+      - "9200:9200"
+      # - "9300:9300"
+
+  kibana:
+    build: ./elasticsearch/elk-hebmorph-docker/kibana
+    volumes:
+      - ./elasticsearch/elk-hebmorph-docker/kibana/config:/opt/kibana/config
+    ports:
+      - "5601:5601"
+    links:
+      - elasticsearch
