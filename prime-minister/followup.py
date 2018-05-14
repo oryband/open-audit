@@ -313,13 +313,16 @@ def tokenize_chapter_office_names(tokenized_lines, office_names):
     העוסקים במלאכה מיומנים ומנוסים בתחום ובמידת הצורך נעזרים
     ברפרנטים מהמטה. המשרדים בודקי
     """
-    for line in tokenized_lines:
+    for i, line in enumerate(tokenized_lines):
         if line['type'] is not None:
             continue
 
         txt = line['text'].strip()
         if txt in office_names:
-            line['type'] = TOKEN_CHAPTER_OFFICE_NAME
+            if tokenized_lines[i-1]['type'] == DEFECT_REPLY_HEADER_RE:
+                line['type'] = TOKEN_DEFECT_REPLY_OFFICE_NAME
+            else:
+                line['type'] = TOKEN_CHAPTER_OFFICE_NAME
 
 
 def tokenize_chapter_topic_discussed_offices(tokenized_lines):
