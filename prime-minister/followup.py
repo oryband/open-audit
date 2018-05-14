@@ -266,17 +266,18 @@ def tokenize_toc(tokenized_lines, office_names):
 
 
 def get_alternative_office_names(path):
-    """Read file with alternative office names and return it.
+    r"""Read file with alternative office names and return it.
 
     File is in structure (YAML):
 
     ---
-    name 1:
-      - alternative name 1
-      - alternative name 2
-    name 2:
-      - alternative name 1
-      - alternative name 2
+    מטלות רוחב ומטלות בין-משרדיות:
+      - מטלות רוחב
+      - מטלות רוחב ומטלות בין משרדיות
+    מערכת הבטחון:
+      - מערכת הביטחון
+    משרדי הממשלה:
+      - משרדי ממשלה
     ---
 
     In the above example, "alternative name x" should be treated
@@ -287,9 +288,30 @@ def get_alternative_office_names(path):
 
 
 def tokenize_chapter_office_names(tokenized_lines, office_names):
-    """Iterate lines and mark lines containing only office names.
+    r"""Iterate lines and mark lines containing only office names.
 
-    Most chapters (except special ones) focus on a single office in every sub-chapter.
+    Most chapters (except special ones) focus on a single office in every sub-chapter:
+
+    רשות המסים בישראל  <-- THIS
+
+    מיסוי הכנסות של תושבי ישראל בחו"ל
+
+    הגופים המבוקרים: רשות המסים, החשב הכללי - משרד האוצר, המוסד לביטוח
+    לאומי, בנק ישראל.
+
+    ליקוי
+
+    ---
+
+    Also, office names are sometimes mentioned before in a defect reply
+
+    תגובה
+
+    רשות המסים  <-- This
+
+    2-1 .רשות המסים סובלת ממצוקת כוח אדם, הן בשדה והן במטה. עם זאת
+    העוסקים במלאכה מיומנים ומנוסים בתחום ובמידת הצורך נעזרים
+    ברפרנטים מהמטה. המשרדים בודקי
     """
     for line in tokenized_lines:
         if line['type'] is not None:
