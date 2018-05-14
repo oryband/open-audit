@@ -89,9 +89,9 @@ DEFECT_DESCRIPTION_RE = re.compile(r'^\s*\S+\s+(.*)')
 #
 # For example: '2-4. bla bla bla' will fetch ["2", "4"]
 # and means this reply corresponds to defects #2,#3,#4
-REPLY_NUMBER_RE = re.compile(r'^\s*(\d+)(?:-(\d+))?\S*')
+DEFECT_REPLY_NUMBER_RE = re.compile(r'^\s*(\d+)(?:-(\d+))?\S*')
 
-REPLY_HEADER_RE = re.compile(r'^\s*תגובה(?:\s+כללית)?\s*$')
+DEFECT_REPLY_HEADER_RE = re.compile(r'^\s*תגובה(?:\s+כללית)?\s*$')
 
 
 # token var names
@@ -129,10 +129,10 @@ TOKEN_DEFECT_BODY_START = 'TOKEN_DEFECT_BODY_START'
 TOKEN_DEFECT_BODY_CONTINUE = 'TOKEN_DEFECT_BODY_CONTINUE'
 
 # defect replies
-TOKEN_REPLY_HEADER = 'TOKEN_REPLY_HEADER'
-TOKEN_REPLY_OFFICE_NAME = 'TOKEN_REPLY_OFFICE_NAME'
-TOKEN_REPLY_BODY_START = 'TOKEN_REPLY_BODY_START'
-TOKEN_REPLY_BODY_CONTINUE = 'TOKEN_REPLY_BODY_CONTINUE'
+TOKEN_DEFECT_REPLY_HEADER = 'TOKEN_DEFECT_REPLY_HEADER'
+TOKEN_DEFECT_REPLY_OFFICE_NAME = 'TOKEN_DEFECT_REPLY_OFFICE_NAME'
+TOKEN_DEFECT_REPLY_BODY_START = 'TOKEN_DEFECT_REPLY_BODY_START'
+TOKEN_DEFECT_REPLY_BODY_CONTINUE = 'TOKEN_DEFECT_REPLY_BODY_CONTINUE'
 
 
 def get_defect_number(line):
@@ -324,20 +324,60 @@ def tokenize_chapter_topic_discussed_offices(tokenized_lines):
             line['type'] = TOKEN_CHAPTER_TOPIC_DISCUSSED_OFFICES_CONTINUE
 
 
-def tokenize_defect_and_reply_headers(tokenized_lines):
-    """Iterate lines and mark lines opening a new defect or reply section."""
+def tokenize_defect_headers(tokenized_lines):
+    r"""Iterate lines and mark lines opening a new defect section.
+
+    Each defect reply has a "ליקוי" string just before the description:
+
+    ליקוי  <-- THIS
+
+    2. הועלה כי דיווחי התאגידים הבנקאיים לבנק ישראל על העברות כספים של תושבי
+    ישראל לחו"ל המבוצעים באמצעותם, משקפים רק חלק מהעברות כספים אלה. למשל, על
+    ...
+
+    תגובה
+
+    רשות המסים
+
+    1-2. רשות המסים סובלת ממצוקת כוח אדם, הן בשדה והן במטה. עם זאת העוסקים
+    במלאכה מיומנים ומנוסים בתחום ובמידת הצורך נעזרים ברפרנטים מהמטה. המשרדים
+    ...
+    """
     for line in tokenized_lines:
         if line['type'] is not None:
             continue
 
-        txt = line['text']
-
-        if DEFECT_HEADER_RE.search(txt) is not None:
+        if DEFECT_HEADER_RE.search(line['text']) is not None:
             line['type'] = TOKEN_DEFECT_HEADER
+
+
+# TODO tokenize office name which comes straight after a defect reply
+# (like "רשות המסים" in the func doc comment here)
+def tokenize_reply_headers(tokenized_lines):
+    r"""Iterate lines and mark lines opening a new defect reply section.
+
+    Each defect reply has a "תגובה" string just before the description:
+
+    ליקוי
+
+    2. הועלה כי דיווחי התאגידים הבנקאיים לבנק ישראל על העברות כספים של תושבי
+    ישראל לחו"ל המבוצעים באמצעותם, משקפים רק חלק מהעברות כספים אלה. למשל, על
+    ...
+
+    תגובה  <-- THIS
+
+    רשות המסים
+
+    1-2. רשות המסים סובלת ממצוקת כוח אדם, הן בשדה והן במטה. עם זאת העוסקים
+    במלאכה מיומנים ומנוסים בתחום ובמידת הצורך נעזרים ברפרנטים מהמטה. המשרדים
+    ...
+    """
+    for line in tokenized_lines:
+        if line['type'] is not None:
             continue
 
-        if REPLY_HEADER_RE.search(txt) is not None:
-            line['type'] = TOKEN_REPLY_HEADER
+        if DEFECT_REPLY_HEADER_RE.search(line['text']) is not None:
+            line['type'] = TOKEN_DEFECT_REPLY_HEADER
 
 
 def tokenize_chapter_topics(tokenized_lines, state_comptroller_defects):
@@ -362,42 +402,64 @@ def tokenize_chapter_topics(tokenized_lines, state_comptroller_defects):
             if txt in defect:
                 if tokenized_lines[i-1]['type'] in [TOKEN_CHAPTER_TOPIC_TITLE_START, TOKEN_CHAPTER_TOPIC_TITLE_CONTINUE]:
                     line['type'] = TOKEN_CHAPTER_TOPIC_TITLE_CONTINUE
-                    print('CONT', txt)
                 else:
                     line['type'] = TOKEN_CHAPTER_TOPIC_TITLE_START
-                    print('START', txt)
 
                 continue
 
 
-def tokenize_defect_and_reply_bodies(tokenized_lines):
-    """Iterate through all lines and mark lines which are part of a defect or reply body."""
-    for i, line in enumerate(tokenized_lines):
-        typ = line['type']
+def tokenize_defect_bodies(tokenized_lines):
+    """Iterate through all lines and mark lines which are part of a defect body.
 
-        if typ is not None:
+    ליקוי
+
+    ---> THIS:
+    2. הועלה כי דיווחי התאגידים הבנקאיים לבנק ישראל על העברות כספים של תושבי
+    ישראל לחו"ל המבוצעים באמצעותם, משקפים רק חלק מהעברות כספים אלה. למשל, על
+    ...
+    """
+    for i, line in enumerate(tokenized_lines):
+        if line['type'] is not None:
             continue
 
         prev_line_type = tokenized_lines[i-1]['type']
-
-        # defects
-
-        if prev_line_type == TOKEN_DEFECT_SECTION_START:
+        if prev_line_type == TOKEN_DEFECT_HEADER:
             line['type'] = TOKEN_DEFECT_BODY_START
-
+            continue
         if prev_line_type in [TOKEN_DEFECT_BODY_START, TOKEN_DEFECT_BODY_CONTINUE]:
             line['type'] = TOKEN_DEFECT_BODY_CONTINUE
 
-        # replies
 
-        elif prev_line_type == TOKEN_REPLY_SECTION_START:
-            line['type'] = TOKEN_REPLY_OFFICE_NAME
+def tokenize_defect_reply_bodies(tokenized_lines):
+    """Iterate through all lines and mark lines which are part of a defect reply body.
 
-        elif prev_line_type == TOKEN_REPLY_OFFICE_NAME:
-            line['type'] = TOKEN_REPLY_BODY_START
+    ליקוי
 
-        elif prev_line_type in [TOKEN_REPLY_BODY_START, TOKEN_REPLY_BODY_CONTINUE]:
-            line['type'] = TOKEN_REPLY_BODY_CONTINUE
+    8. בתע"א לא נמצאו תימוכין לתשובות שהעבירו מנהלי התע"א לעוזרי המנכ"ל
+    ולמנכ"ל בעניין יישום החלטות ההנהלה, לרבות הסיבות לעיכוב ביישומן. כמו כן,
+    ...
+
+    תגובה
+
+    התעשייה האווירית
+
+    ---> THIS:
+    7-8. עוזר המנכ"ל הינו הגורם האחראי ובעל הסמכות למעקב ואכיפת החלטות
+    המנכ"ל. פניות מסוימות בנושא הועברו באופן שוטף למנכ"ל ו/או לבעלי תפקידים
+    ...
+    """
+    for i, line in enumerate(tokenized_lines):
+        if line['type'] is not None:
+            continue
+
+        prev_line_type = tokenized_lines[i-1]['type']
+        if prev_line_type in [TOKEN_DEFECT_REPLY_HEADER, TOKEN_DEFECT_REPLY_OFFICE_NAME]:
+            line['type'] = TOKEN_DEFECT_REPLY_BODY_START
+            print('START', line['text'])
+            continue
+        if prev_line_type in [TOKEN_DEFECT_REPLY_BODY_START, TOKEN_DEFECT_REPLY_BODY_CONTINUE]:
+            line['type'] = TOKEN_DEFECT_REPLY_BODY_CONTINUE
+            print('CONT', line['text'])
 
 
 def tokenize(lines, alternative_office_names_path, state_comptroller_preface_path):
@@ -425,12 +487,15 @@ def tokenize(lines, alternative_office_names_path, state_comptroller_preface_pat
     combined_office_names = set(alternative_office_names) | set(state_comptroller_offices)
 
     tokenize_toc(tokenized_lines, combined_office_names)
+    tokenize_defect_headers(tokenized_lines)
+    tokenize_reply_headers(tokenized_lines)
     tokenize_chapter_office_names(tokenized_lines, combined_office_names)
-    tokenize_defect_and_reply_headers(tokenized_lines)
     tokenize_chapter_topic_discussed_offices(tokenized_lines)
     tokenize_chapter_topics(tokenized_lines, state_comptroller_defects)
     # TODO this is what's left
-    tokenize_defect_and_reply_bodies(tokenized_lines)
+    tokenize_defect_bodies(tokenized_lines)
+    # TODO buggy function:
+    tokenize_defect_reply_bodies(tokenized_lines)
 
     return tokenized_lines
 
