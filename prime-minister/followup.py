@@ -593,4 +593,8 @@ if __name__ == '__main__':
                  if l.strip() != '']  # filter empty lines
 
     TOKENIZED_LINES = tokenize(LINES, sys.argv[2], sys.argv[3])
+
+    # for l in TOKENIZED_LINES:
+    #     print(l['type'], l['text'][:30])
+
     # print_tokens(TOKENIZED_LINES)
