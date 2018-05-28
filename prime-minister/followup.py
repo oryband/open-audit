@@ -319,7 +319,7 @@ def tokenize_chapter_office_names(tokenized_lines, office_names):
 
         txt = line['text'].strip()
         if txt in office_names:
-            if tokenized_lines[i-1]['type'] == DEFECT_REPLY_HEADER_RE:
+            if tokenized_lines[i-1]['type'] == TOKEN_DEFECT_REPLY_HEADER:
                 line['type'] = TOKEN_DEFECT_REPLY_OFFICE_NAME
             else:
                 line['type'] = TOKEN_CHAPTER_OFFICE_NAME
