@@ -478,13 +478,12 @@ def tokenize_defect_reply_bodies(tokenized_lines):
             continue
 
         prev_line_type = tokenized_lines[i-1]['type']
+
         if prev_line_type in [TOKEN_DEFECT_REPLY_HEADER, TOKEN_DEFECT_REPLY_OFFICE_NAME]:
             line['type'] = TOKEN_DEFECT_REPLY_BODY_START
-            print('START', line['text'])
             continue
         if prev_line_type in [TOKEN_DEFECT_REPLY_BODY_START, TOKEN_DEFECT_REPLY_BODY_CONTINUE]:
             line['type'] = TOKEN_DEFECT_REPLY_BODY_CONTINUE
-            print('CONT', line['text'])
 
 
 def tokenize(lines, alternative_office_names_path, state_comptroller_preface_path):
