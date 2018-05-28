@@ -292,7 +292,8 @@ def tokenize_reply_headers(tokenized_lines):
             line['type'] = TOKEN_DEFECT_REPLY_HEADER
 
 
-def tokenize_chapter_topics(tokenized_lines, state_comptroller_defects):
+# TODO BUGGY FUNCTION
+def tokenize_chapter_topics(tokenized_lines, state_comptroller_offices, state_comptroller_defects):
     r"""Iterate lines and mark lines opening a new chapter topic.
 
     New topics are introduced in the following structure
@@ -304,11 +305,23 @@ def tokenize_chapter_topics(tokenized_lines, state_comptroller_defects):
     \n
     office names: הגופים המבוקרים: התעשייה האווירית לישראל בע"מ, רשות החברות הממשלתיות.
     """
+    # TODO FIX THIS
+    def is_txt_is_an_office(txt, offices):
+        if
+        print(txt)
+        for o in offices:
+            if txt in o:
+                return True
+        return False
+
     for i, line in enumerate(tokenized_lines):
         if line['type'] is not None:
             continue
 
         txt = line['text'].strip()
+
+        if is_txt_is_an_office(txt, state_comptroller_offices):
+            continue
 
         for defect in state_comptroller_defects:
             if txt in defect:
@@ -403,7 +416,7 @@ def tokenize(lines, alternative_office_names_path, state_comptroller_preface_pat
     tokenize_chapter_office_names(tokenized_lines, combined_office_names)
     tokenize_chapter_topic_discussed_offices(tokenized_lines)
     # TODO bug in here
-    tokenize_chapter_topics(tokenized_lines, state_comptroller_defects)
+    tokenize_chapter_topics(tokenized_lines, state_comptroller_offices, state_comptroller_defects)
     tokenize_defect_bodies(tokenized_lines)
     tokenize_defect_reply_bodies(tokenized_lines)
 
