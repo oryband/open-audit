@@ -515,10 +515,9 @@ def tokenize(lines, alternative_office_names_path, state_comptroller_preface_pat
     tokenize_reply_headers(tokenized_lines)
     tokenize_chapter_office_names(tokenized_lines, combined_office_names)
     tokenize_chapter_topic_discussed_offices(tokenized_lines)
+    # TODO bug in here
     tokenize_chapter_topics(tokenized_lines, state_comptroller_defects)
-    # TODO this is what's left
     tokenize_defect_bodies(tokenized_lines)
-    # TODO buggy function:
     tokenize_defect_reply_bodies(tokenized_lines)
 
     return tokenized_lines
