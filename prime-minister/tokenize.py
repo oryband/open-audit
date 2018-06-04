@@ -86,6 +86,8 @@ def get_state_comptroller_offices_and_defects(path):
     return offices, defects
 
 
+# FIXME TOC items in 67b (b NOT a!) are not tokenized because they are תקציר
+# chapters (see the first chapter)
 def tokenize_toc(tokenized_lines, office_names):
     """Iterate lines and mark ones which are part of the table of contents.
 
@@ -106,16 +108,29 @@ def tokenize_toc(tokenized_lines, office_names):
         if regex.TOC_START_RE.search(txt) is not None:
             line['type'] = TOKEN_TOC_HEADER
             toc_start_line_num = line_num
+
+            # the line identifying the end of the TOC is the the first chapter title,
+            # which is also the line coming right after the TOC title
+            #
+            # generate a regex and search for it from here on to identify
+            # the end of the TOC
+            toc_end_txt = tokenized_lines[line_num + 1]['text'].strip()
+
             continue
 
-        if regex.TOC_END_RE.search(txt) is not None:
-            first_episode_encountered_counter += 1
-            if first_episode_encountered_counter == 2:
-                # TODO need to tokenize all chapter headers in the document,
-                # this is just the first one
-                line['type'] = TOKEN_CHAPTER_HEADER
-                toc_end_line_num = line_num
-                break
+        try:
+            toc_end_txt
+        except NameError:
+            continue
+        else:
+            if txt.strip() in toc_end_txt:
+                first_episode_encountered_counter += 1
+                if first_episode_encountered_counter == 2:
+                    # TODO need to tokenize all chapter headers in the document,
+                    # this is just the first one
+                    line['type'] = TOKEN_CHAPTER_HEADER
+                    toc_end_line_num = line_num
+                    break
 
     tokenized_toc_lines = tokenized_lines[toc_start_line_num:toc_end_line_num + 1]
 
