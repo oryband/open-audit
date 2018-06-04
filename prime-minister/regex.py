@@ -64,7 +64,7 @@ TOC_CHAPTER_ITEM_RE_END = re.compile(r'^\s*(.+?)\.{3,}\d+$')
 TOC_ITEM_JOIN_RE = re.compile(r'\n\s*')
 
 # regex searching for office names being discussed in a chapter.
-CHAPTER_TOPIC_DISCUSSED_OFFICES_RE = re.compile(r'^\s*הגופים המבוקרים:\s(.+)$')
+CHAPTER_TOPIC_DISCUSSED_OFFICES_RE = re.compile(r'^\s*(הגוף המבוקר|הגופים המבוקרים|המשרדים המבוקרים)(?: )?:\s(.+)$')
 
 # regex searching for defect number (or numbers) in the beginning of a paragraph.
 # for example: '2. bla bla bla' will fetch "2".

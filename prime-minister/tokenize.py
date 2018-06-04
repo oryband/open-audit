@@ -305,23 +305,11 @@ def tokenize_chapter_topics(tokenized_lines, state_comptroller_offices, state_co
     \n
     office names: הגופים המבוקרים: התעשייה האווירית לישראל בע"מ, רשות החברות הממשלתיות.
     """
-    # TODO FIX THIS
-    def is_txt_is_an_office(txt, offices):
-        if
-        print(txt)
-        for o in offices:
-            if txt in o:
-                return True
-        return False
-
     for i, line in enumerate(tokenized_lines):
         if line['type'] is not None:
             continue
 
         txt = line['text'].strip()
-
-        if is_txt_is_an_office(txt, state_comptroller_offices):
-            continue
 
         for defect in state_comptroller_defects:
             if txt in defect:
