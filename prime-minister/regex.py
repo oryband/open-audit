@@ -9,6 +9,10 @@ TOC_START_RE = re.compile(r'^\s*תוכן [ה]?עני[י]?נים\s*$')
 # this is the instance of "פרק ראשון"
 TOC_END_RE = re.compile(r'^\s*פרק\s+ראשון\s*$')
 
+# regex for detecting TOC summary section, which on some reports appear before
+# chapter TOC titltes. some reports omit this section
+TOC_SUMMARY_RE = re.compile(r'^\s*(?:תקציר\s+.*|תקצירים\s*)$')
+
 # regexes for detecting a TOC chapter number in text form
 # WITHOUT any following title, for example:
 #
