@@ -19,6 +19,11 @@ def tokenize(tokenized_lines, office_names):
     return tokenized_lines
 
 
+# TODO XXX this function is still buggy. start line is found AFTER the end line
+# in 67b report.
+#
+# TODO XXX in addition the tokenization of some specific token types in *non*-TOC lines
+# in 67a is wrong, go over the document and see
 def find_borders(tokenized_lines):
     """Iterate TOC lines and find start and end of TOC section.
 
@@ -26,19 +31,24 @@ def find_borders(tokenized_lines):
     of the TOC in some reports.
     """
     # we identify the end of the TOC and beginning of actual content of the
-    # report by looking at the first TOC title and searching for it's second
-    # instance i.e. when it appears again for the second time.
+    # report by looking at the first TOC title and searching
+    # for when it appears again for the second time.
     #
-    # This can either be the beginning of the summary chapter,
+    # this can either be the beginning of the summary chapter,
     # or if the summary doesn't exist in the report - the first chapter.
-    #
-    # we use these variables to find the first and second occurences
+    toc_start_line_num = None
+    toc_end_line_num = None
+
+    # this is used to find the first and second occurences
     # of summary 'תקציר' or 'פרק ראשון' and then we'll know where the TOC titles starts and ends.
-    summary_exists = False
-    summary_text = None
-    toc_border_re_instance_counter = 0
+    summary_title = None
 
     for line_num, line in enumerate(tokenized_lines):
+        # if both TOC start + end border lines were found,
+        # there's nothing left to do
+        if toc_start_line_num is not None and toc_end_line_num is not None:
+            return tokenized_lines[toc_start_line_num:toc_end_line_num]
+
         if line['type'] is not None:
             continue
 
@@ -55,53 +65,32 @@ def find_borders(tokenized_lines):
         # NOTE this appears only in some reports
         #
         # TODO tokenize this section
-        if (not summary_exists and  # ignore second instance since this is not part of the TOC
-                regex.TOC_SUMMARY_RE.search(txt) is not None):
-            line['type'] = tokens.TOKEN_TOC_SUMMARY_START
-
-            toc_border_re_instance_counter += 1
-            summary_exists = True
-            summary_text = txt.strip()
+        if summary_title is None and regex.TOC_BORDER_IDENTIFIER_SUMMARY_RE.search(txt) is not None:
+            # we'll search for this text for the second occurence of the summary title
+            summary_title = txt.strip()
 
             continue
 
-        # look for the first and second occurences of the the first TOC title,
-        # whether it's the summary summary or the first chapter.
-        #
-        # XXX finish this section: finding the borders what summary chapter
-        # appears in the report or when it isn't, and then we need to look for first chapter
-        if summary_exists:
-            def border_re_condition(txt):
-                return summary_text.startswith(txt)
-        else:
-            def border_re_condition(txt):
-                if regex.TOC_END_RE.search(txt) is not None:
-                    toc_border_re_instance_counter += 1
-                    return True
-                return False
+        if summary_title is not None and summary_title.startswith(txt.strip()):
+            toc_end_line_num = line_num
 
-        if border_re_condition(txt.strip()):
-            if toc_border_re_instance_counter == 1:
+            continue
+
+        if regex.TOC_BORDER_IDENTIFIER_FIRST_CHAPTER_RE.search(txt) is not None:
+            # set the start line by checking if it isn't defined yet
+            if toc_start_line_num is None:
                 toc_start_line_num = line_num
 
-            elif toc_border_re_instance_counter == 2:
-                # TODO need to tokenize all chapter headers in the document,
-                # this is just the first one
-                if summary_exists:
-                    line['type'] = tokens.TOKEN_SUMMARY_HEADER
-                else:
-                    line['type'] = tokens.TOKEN_CHAPTER_HEADER
+                continue
 
+            if toc_end_line_num is None:
                 toc_end_line_num = line_num
-
-            else:
-                # there shouldn't be more than two instances of 'פרק ראשון'
-                raise RuntimeError
 
             continue
 
-    # the toc section we should process is between the two instances of 'פרק ראשון'
-    return tokenized_lines[toc_start_line_num:toc_end_line_num]
+    # reaching this line mean we iterated over all document lines and didn't
+    # find TOC borders, should be impossible
+    raise RuntimeError
 
 
 def tokenize_office_names(tokenized_lines, office_names):

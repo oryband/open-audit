@@ -5,13 +5,14 @@ import re
 # allowing for some missing redundant characters and padding spaces
 TOC_START_RE = re.compile(r'^\s*תוכן [ה]?עני[י]?נים\s*$')
 
-# regex for detecting TOC end (not including this line).
-# this is the instance of "פרק ראשון"
-TOC_END_RE = re.compile(r'^\s*פרק\s+ראשון\s*$')
-
-# regex for detecting TOC summary section, which on some reports appear before
-# chapter TOC titltes. some reports omit this section
-TOC_SUMMARY_RE = re.compile(r'^\s*(?:תקציר\s+.*|תקצירים\s*)$')
+# we identify the end of the TOC and beginning of actual content of the
+# report by looking at the first TOC title and searching
+# for when it appears again for the second time.
+#
+# This can either be the beginning of the summary chapter,
+# or if the summary doesn't exist in the report - the first chapter.
+TOC_BORDER_IDENTIFIER_FIRST_CHAPTER_RE = re.compile(r'^\s*פרק\s+ראשון\s*$')
+TOC_BORDER_IDENTIFIER_SUMMARY_RE = re.compile(r'^\s*(?:תקציר\s+.*|תקצירים\s*)$')
 
 # regexes for detecting a TOC chapter number in text form
 # WITHOUT any following title, for example:
