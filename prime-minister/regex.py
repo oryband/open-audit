@@ -3,7 +3,7 @@ import re
 
 # regex for detecting TOC opening header "תוכן העניינים"
 # allowing for some missing redundant characters and padding spaces
-TOC_START_RE = re.compile(r'^\s*תוכן [ה]?עני[י]?נים\s*$')
+TOC_HEADER_RE = re.compile(r'^\s*תוכן [ה]?עני[י]?נים\s*$')
 
 # we identify the end of the TOC and beginning of actual content of the
 # report by looking at the first TOC title and searching
@@ -11,7 +11,7 @@ TOC_START_RE = re.compile(r'^\s*תוכן [ה]?עני[י]?נים\s*$')
 #
 # This can either be the beginning of the summary chapter,
 # or if the summary doesn't exist in the report - the first chapter.
-TOC_BORDER_IDENTIFIER_FIRST_CHAPTER_RE = re.compile(r'^\s*פרק\s+ראשון\s*$')
+TOC_BORDER_IDENTIFIER_FIRST_CHAPTER_RE = re.compile(r'^\s*פרק\s+ראשון(\s*|\s+.*)$')
 TOC_BORDER_IDENTIFIER_SUMMARY_RE = re.compile(r'^\s*(?:תקציר\s+.*|תקצירים\s*)$')
 
 # regexes for detecting a TOC chapter number in text form
@@ -39,7 +39,11 @@ TOC_CHAPTER_NUMBER_RE = re.compile(r'^\s*(פרק\s+\w+)\s*$')
 # - fetch all office names from state-comptroller output files,
 #   and in addition construct a common office alternative names e.g. משרד הבטחון | משרד הב_י_טחון
 #   then tokenize them second (as offices)
-TOC_CHAPTER_TITLE_RE = re.compile(r'^\s*(פרק\s+\w+)\s+-\s+(.+)$')
+TOC_CHAPTER_NUMBER_WITH_TITLE_RE = re.compile(r'^\s*(פרק\s+\w+)\s+-\s+(.+)$')
+
+# regex for detecting a special TOC chapter number with title
+# that does NOT have an office name in the following line
+TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE_RE = re.compile(r'^\s*(פרק\s+\w+)\s+-\s+(מטלות רוחב(?:$|\s+.+))$')
 
 # regex for detecting a TOC chapter office, for example:
 # פרק חמישי - מוסדות המדינה, חברות ממשלתיות
@@ -59,7 +63,7 @@ TOC_CHAPTER_OFFICE_RE = re.compile(r'^\s*(.*)\s*$')
 #
 # NOTE we're ignoring the multiple dots and page number, and taking just the
 # text.
-TOC_CHAPTER_ITEM_RE_START = re.compile(r'^\s*\d+\.\s+(.+?)(?:\.{3,}\d+)?$')
+TOC_CHAPTER_ITEM_RE_START = re.compile(r'^\s*(?:\d+\.\s+)??(.+?)(?:\.{3,}\d+)?$')
 TOC_CHAPTER_ITEM_RE_CONTINUE = re.compile(r'^\s*(.*)\s*$')
 TOC_CHAPTER_ITEM_RE_END = re.compile(r'^\s*(.+?)\.{3,}\d+$')
 
