@@ -43,6 +43,8 @@ TOC_CHAPTER_NUMBER_WITH_TITLE_RE = re.compile(r'^\s*(פרק\s+\w+)\s+-\s+(.+)$')
 
 # regex for detecting a special TOC chapter number with title
 # that does NOT have an office name in the following line
+#
+# used for catching speciall chapter discussin cross-office subjects (מטלות רוחב)
 TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE_RE = re.compile(r'^\s*(פרק\s+\w+)\s+-\s+(מטלות רוחב(?:$|\s+.+))$')
 
 # regex for detecting a TOC chapter office, for example:
@@ -63,9 +65,9 @@ TOC_CHAPTER_OFFICE_RE = re.compile(r'^\s*(.*)\s*$')
 #
 # NOTE we're ignoring the multiple dots and page number, and taking just the
 # text.
-TOC_CHAPTER_ITEM_RE_START = re.compile(r'^\s*(?:\d+\.\s+)??(.+?)(?:\.{3,}\d+)?$')
-TOC_CHAPTER_ITEM_RE_CONTINUE = re.compile(r'^\s*(.*)\s*$')
-TOC_CHAPTER_ITEM_RE_END = re.compile(r'^\s*(.+?)\.{3,}\d+$')
+TOC_CHAPTER_ITEM_RE_ONE_LINE = re.compile(r'^\s*(?:\d+\.\s+)??(.+?)\s*(?:\d+)$')
+TOC_CHAPTER_ITEM_RE_MULTI_LINE_START = re.compile(r'^\s*(?:\d+\.\s+)??(.+?)(?<!\d)\s*$')
+TOC_CHAPTER_ITEM_RE_MULTI_LINE_END = TOC_CHAPTER_ITEM_RE_ONE_LINE
 
 # regex for joining TOC items which are split across multiple lines.
 # should be used with re.sub() for removing newlines

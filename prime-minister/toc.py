@@ -146,16 +146,17 @@ def tokenize_chapter_titles(tokenized_lines):
 
             continue
 
-        # if the previous line was a chapter number WITH title
-        # (and if this line wasn't tokenized yet)
+        # if the previous line was a chapter number WITH title,
+        # and if this line wasn't tokenized yet,
+        # and if this line doesn't look like an item (i.e. line ends with a page number)
         # then it means it's a continuation of the chapter number WITH title
-        if tokenized_lines[i-1]['type'] == tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_START:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_CONTINUE
+        if (tokenized_lines[i-1]['type'] == tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_START and
+                regex.TOC_CHAPTER_ITEM_RE_ONE_LINE.search(txt) is None):
 
+            line['type'] = tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_CONTINUE
             continue
 
 
-# TODO this is tokenizing badly for 67b
 def tokenize_chapter_items(tokenized_lines):
     """Run over TOC lines and tokenize chapter items."""
     for i, line in enumerate(tokenized_lines):
@@ -164,14 +165,23 @@ def tokenize_chapter_items(tokenized_lines):
             continue
 
         txt = line['text'].strip()
-        if regex.TOC_CHAPTER_ITEM_RE_START.search(txt) is not None:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_START
+        if tokenized_lines[i-1]['type'] in [tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_START,
+                                            tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE]:
+
+            if regex.TOC_CHAPTER_ITEM_RE_MULTI_LINE_START.search(txt) is not None:
+                line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE
+                continue
+
+            if regex.TOC_CHAPTER_ITEM_RE_MULTI_LINE_END.search(txt) is not None:
+                line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_END
+                continue
+
             continue
-        if regex.TOC_CHAPTER_ITEM_RE_END.search(txt) is not None:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_CONTINUE
+
+        if regex.TOC_CHAPTER_ITEM_RE_MULTI_LINE_START.search(txt) is not None:
+            line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_START
             continue
-        if (tokenized_lines[i-1]['type'] in [tokens.TOKEN_TOC_CHAPTER_ITEM_START,
-                                             tokens.TOKEN_TOC_CHAPTER_ITEM_CONTINUE] and
-                regex.TOC_CHAPTER_ITEM_RE_END.search(txt) is None):
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_CONTINUE
+
+        if regex.TOC_CHAPTER_ITEM_RE_ONE_LINE.search(txt) is not None:
+            line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_ONE_LINE
             continue
