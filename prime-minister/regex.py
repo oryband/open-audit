@@ -98,4 +98,4 @@ DEFECT_DESCRIPTION_RE = re.compile(r'^\s*\S+\s+(.*)')
 # and means this reply corresponds to defects #2,#3,#4
 DEFECT_REPLY_NUMBER_RE = re.compile(r'^\s*(\d+)(?:-(\d+))?\S*')
 
-DEFECT_REPLY_HEADER_RE = re.compile(r'^\s*תגובה(?:\s+כללית)?\s*$')
+DEFECT_REPLY_HEADER_RE = re.compile(r'^\s*תגוב(?:ה|ת)(?:\s+כללית|)?\s*$')
