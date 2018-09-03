@@ -286,8 +286,6 @@ def tokenize_defect_reply_bodies(tokenized_lines):
             line['type'] = tokens.TOKEN_DEFECT_REPLY_BODY_CONTINUE
 
 
-# TODO the tokenization of some specific token types in *non*-TOC lines
-# in 67a is wrong, go over the document and see
 def tokenize(lines, alternative_office_names_path, state_comptroller_preface_path):
     r"""Tokenize all lines (by line, not word) according to type.
 
