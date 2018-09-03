@@ -219,7 +219,8 @@ def tokenize_chapter_topics(tokenized_lines, state_comptroller_offices, state_co
 
         # TODO levenstein here
         for defect in state_comptroller_defects:
-            if txt in defect:
+            # ignore single words lines since they can create false positives
+            if txt in defect and len(txt.split()) > 1:
                 if tokenized_lines[i-1]['type'] in [tokens.TOKEN_CHAPTER_TOPIC_TITLE_START,
                                                     tokens.TOKEN_CHAPTER_TOPIC_TITLE_CONTINUE]:
                     line['type'] = tokens.TOKEN_CHAPTER_TOPIC_TITLE_CONTINUE
