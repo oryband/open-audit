@@ -168,7 +168,37 @@ def tokenize_reply_headers(tokenized_lines):
             line['type'] = tokens.TOKEN_DEFECT_REPLY_HEADER
 
 
-# TODO BUGGY FUNCTION
+def tokenize_chapter_numbers(tokenized_lines):
+    r"""Iterate lines and mark lines containing only a chapter number:
+
+    פרק שני  <-- THIS
+
+    ניהול ותפעול של אתרי תיירות
+    באגן העיר העתיקה בירושלים
+    """
+    for line in tokenized_lines:
+        if line['type'] is not None:
+            continue
+
+        if regex.CHAPTER_NUMBER_RE.search(line['text']) is not None:
+            line['type'] = tokens.TOKEN_CHAPTER_NUMBER
+
+
+# TODO after each chapter header (e.g. "פרק ראשןו") there's an optional chapter
+# title e.g. "פרק ראשון - היבטים בהיערכות המדינה להגנת המרחב הקיברנט".
+# the chapter title is sometimes repeated twice: once in a page of it's own
+# similar to a page cover, and then again right before the actual content of
+# the chapter. this causes the function to tokenize the chapter title either twice
+# or as a single token, with the text repeating itself within the token twice.
+# both of these scenarios are wrong, and this needs to be fixed.
+# imo the correct solution would be to tokenize the repetition as two separate
+# different tokens, and then ignore the first one at later processing.
+# there's no other visible way to make the tokenizer understand the first
+# occurence is a page cover - since it is sometimes ommitted.
+#
+# TODO defects descriptions are sometimes written inconsistently (e.g. אזור and איזור)
+# whic means they are not properly recognized in this function. might need to
+# apply levenstein distances or similar methods to comensate for this
 def tokenize_chapter_topics(tokenized_lines, state_comptroller_offices, state_comptroller_defects):
     r"""Iterate lines and mark lines opening a new chapter topic.
 
@@ -187,6 +217,7 @@ def tokenize_chapter_topics(tokenized_lines, state_comptroller_offices, state_co
 
         txt = line['text'].strip()
 
+        # TODO levenstein here
         for defect in state_comptroller_defects:
             if txt in defect:
                 if tokenized_lines[i-1]['type'] in [tokens.TOKEN_CHAPTER_TOPIC_TITLE_START,
@@ -281,6 +312,7 @@ def tokenize(lines, alternative_office_names_path, state_comptroller_preface_pat
     combined_office_names = set(alternative_office_names) | set(state_comptroller_offices)
 
     toc.tokenize(tokenized_lines, combined_office_names)
+    tokenize_chapter_numbers(tokenized_lines)
     tokenize_defect_headers(tokenized_lines)
     tokenize_reply_headers(tokenized_lines)
     tokenize_chapter_office_names(tokenized_lines, combined_office_names)

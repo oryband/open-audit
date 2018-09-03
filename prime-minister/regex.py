@@ -74,6 +74,9 @@ TOC_CHAPTER_ITEM_RE_MULTI_LINE_END = TOC_CHAPTER_ITEM_RE_ONE_LINE
 # and truncating extra spaces.
 TOC_ITEM_JOIN_RE = re.compile(r'\n\s*')
 
+# regex for detecting chapter numbers, outside of TOC
+CHAPTER_NUMBER_RE = TOC_CHAPTER_NUMBER_RE
+
 # regex searching for office names being discussed in a chapter.
 CHAPTER_TOPIC_DISCUSSED_OFFICES_RE = re.compile(r'^\s*(הגוף המבוקר|הגופים המבוקרים|המשרדים המבוקרים)(?: )?:\s(.+)$')
 
