@@ -322,13 +322,29 @@ def tokenize(lines, alternative_office_names_path, state_comptroller_preface_pat
     return tokenized_lines
 
 
-if __name__ == '__main__':
+def demo():
+    """Tokenize lines from prime minister followup document and print them to screen.
+
+    This function is a demo showcasing this file's features.
+
+    Receive the following arguments:
+
+    - Pandoc plaintext output of followup document, orginially in docx format.
+    - Office name to alternative office name map, in yaml format
+    - State comptroller report output from state comptroller spider.
+      This is just a single object of the relevant report from the entire spider output.
+      See state-comptroller directory for more information.
+    """
     with open(sys.argv[1], 'r') as f:
-        LINES = [l for l
+        lines = [l for l
                  in f.readlines()
                  if l.strip() != '']  # filter empty lines
 
-    TOKENIZED_LINES = tokenize(LINES, sys.argv[2], sys.argv[3])
+    tokenized_lines = tokenize(lines, sys.argv[2], sys.argv[3])
 
-    for l in TOKENIZED_LINES:
+    for l in tokenized_lines:
         print(l['type'], l['text'][:30])
+
+
+if __name__ == '__main__':
+    demo()
