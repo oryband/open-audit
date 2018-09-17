@@ -3,6 +3,7 @@
 disable=
     redefined-outer-name,
     too-many-arguments,
+    line-too-long,
     missing-docstring
 
 [FORMAT]
