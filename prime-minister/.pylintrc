@@ -10,5 +10,7 @@ disable=
 good-names=i,j,k,f,c
 
 [BASIC]
+variable-rgx=[a-z_][a-z0-9_]{0,62}$
 
-variable-rgx=[a-z_][a-z0-9_]{2,62}$
+
+# vi: ft=toml
