@@ -3,7 +3,6 @@
 
 import json
 import itertools
-import re
 import sys
 
 import yaml
@@ -169,7 +168,7 @@ def tokenize_reply_headers(tokenized_lines):
 
 
 def tokenize_chapter_numbers(tokenized_lines):
-    r"""Iterate lines and mark lines containing only a chapter number:
+    r"""Iterate lines and mark lines containing only a chapter number.
 
     פרק שני  <-- THIS
 
@@ -199,7 +198,7 @@ def tokenize_chapter_numbers(tokenized_lines):
 # TODO defects descriptions are sometimes written inconsistently (e.g. אזור and איזור)
 # whic means they are not properly recognized in this function. might need to
 # apply levenstein distances or similar methods to comensate for this
-def tokenize_chapter_topics(tokenized_lines, state_comptroller_offices, state_comptroller_defects):
+def tokenize_chapter_topics(tokenized_lines, state_comptroller_defects):
     r"""Iterate lines and mark lines opening a new chapter topic.
 
     New topics are introduced in the following structure
@@ -316,7 +315,7 @@ def tokenize(lines, alternative_office_names_path, state_comptroller_preface_pat
     tokenize_reply_headers(tokenized_lines)
     tokenize_chapter_office_names(tokenized_lines, combined_office_names)
     tokenize_chapter_topic_discussed_offices(tokenized_lines)
-    tokenize_chapter_topics(tokenized_lines, state_comptroller_offices, state_comptroller_defects)
+    tokenize_chapter_topics(tokenized_lines, state_comptroller_defects)
     tokenize_defect_bodies(tokenized_lines)
     tokenize_defect_reply_bodies(tokenized_lines)
 
