@@ -322,55 +322,6 @@ def tokenize(lines, alternative_office_names_path, state_comptroller_preface_pat
     return tokenized_lines
 
 
-# TODO
-# def print_tokens(tokenized_lines):
-#     """Iterate all tokenized lines and prints their content."""
-#     for line in tokenized_lines:
-#         txt = line['text']
-#         typ = line['type']
-
-#         if typ == tokens.TOKEN_DEFECT_SECTION_START:
-#             continue
-
-#         elif typ == tokens.TOKEN_DEFECT_BODY_START:
-#             number = get_defect_number(txt)
-#             body = get_defect_body(txt)
-
-#             print('DEFECT START', '({})'.format(number), body)
-
-#         elif typ == tokens.TOKEN_DEFECT_BODY_CONTINUE:
-#             print('DEFECT CONTINUE', txt)
-
-#         elif typ == tokens.TOKEN_REPLY_SECTION_START:
-#             continue
-
-#         elif typ == tokens.TOKEN_REPLY_OFFICE_NAME:
-#             print('DEFECT OFFICE NAME', txt)
-#             continue
-
-#         elif typ == tokens.TOKEN_REPLY_BODY_START:
-#             number_start_str, number_end_str = get_reply_number_range(txt)
-#             start = int(number_start_str)
-#             if number_end_str is not None:
-#                 end = int(number_end_str)
-#                 number_range = list(range(start, end)) + [end]
-#             else:
-#                 number_range = [start]
-
-#             body = get_reply_body(txt)
-
-#             print('REPLY START', '({})'.format(number_range), body)
-
-#         elif typ == tokens.TOKEN_REPLY_BODY_CONTINUE:
-#             print('REPLY CONTINUE', txt)
-
-#         elif typ == tokens.TOKEN_TOPIC_START:
-#             print('TOPIC START', txt)
-
-#         elif typ == tokens.TOKEN_TOPIC_CONTINUE:
-#             print('TOPIC CONTINUE', txt)
-
-
 if __name__ == '__main__':
     with open(sys.argv[1], 'r') as f:
         LINES = [l for l
@@ -381,5 +332,3 @@ if __name__ == '__main__':
 
     for l in TOKENIZED_LINES:
         print(l['type'], l['text'][:30])
-
-    # print_tokens(TOKENIZED_LINES)
