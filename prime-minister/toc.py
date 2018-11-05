@@ -52,7 +52,7 @@ def find_borders_without_summary(tokenized_lines):
 
         # find TOC header
         if regex.TOC_HEADER_RE.search(txt) is not None:
-            line['type'] = tokens.TOKEN_TOC_HEADER
+            line['type'] = tokens.TOC_HEADER
 
             continue
 
@@ -102,7 +102,7 @@ def tokenize_office_names(tokenized_lines, office_names):
             continue
 
         if line['text'].strip() in office_names:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_OFFICE
+            line['type'] = tokens.TOC_CHAPTER_OFFICE
             continue
 
 
@@ -115,7 +115,7 @@ def tokenize_chapter_titles(tokenized_lines):
         # skip tokenized lines OR
         # lines coming right after a chapter office line
         if (line['type'] is not None or
-                tokenized_lines[i-1]['type'] == tokens.TOKEN_TOC_CHAPTER_OFFICE):
+                tokenized_lines[i-1]['type'] == tokens.TOC_CHAPTER_OFFICE):
             continue
 
         txt = line['text'].strip()
@@ -128,21 +128,21 @@ def tokenize_chapter_titles(tokenized_lines):
         # we have to treat it differently then the rest of the titles,
         # which also deal with multi-line chapter number with title
         if regex.TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE_RE.search(txt) is not None:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE
+            line['type'] = tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE
 
             continue
 
         # search for chapter number without title
         # e.g. 'פרק ראשון
         if regex.TOC_CHAPTER_NUMBER_RE.search(txt) is not None:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_NUMBER
+            line['type'] = tokens.TOC_CHAPTER_NUMBER
 
             continue
 
         # search for chapter number WITH title
         # e.g. 'פרק ראשון - מטלות רוחב"
         if regex.TOC_CHAPTER_NUMBER_WITH_TITLE_RE.search(txt) is not None:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_START
+            line['type'] = tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_START
 
             continue
 
@@ -150,10 +150,10 @@ def tokenize_chapter_titles(tokenized_lines):
         # and if this line wasn't tokenized yet,
         # and if this line doesn't look like an item (i.e. line ends with a page number)
         # then it means it's a continuation of the chapter number WITH title
-        if (tokenized_lines[i-1]['type'] == tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_START and
+        if (tokenized_lines[i-1]['type'] == tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_START and
                 regex.TOC_CHAPTER_ITEM_RE_ONE_LINE.search(txt) is None):
 
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_CONTINUE
+            line['type'] = tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_CONTINUE
             continue
 
 
@@ -165,23 +165,23 @@ def tokenize_chapter_items(tokenized_lines):
             continue
 
         txt = line['text'].strip()
-        if tokenized_lines[i-1]['type'] in [tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_START,
-                                            tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE]:
+        if tokenized_lines[i-1]['type'] in [tokens.TOC_CHAPTER_ITEM_MULTI_LINE_START,
+                                            tokens.TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE]:
 
             if regex.TOC_CHAPTER_ITEM_RE_MULTI_LINE_START.search(txt) is not None:
-                line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE
+                line['type'] = tokens.TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE
                 continue
 
             if regex.TOC_CHAPTER_ITEM_RE_MULTI_LINE_END.search(txt) is not None:
-                line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_END
+                line['type'] = tokens.TOC_CHAPTER_ITEM_MULTI_LINE_END
                 continue
 
             continue
 
         if regex.TOC_CHAPTER_ITEM_RE_MULTI_LINE_START.search(txt) is not None:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_START
+            line['type'] = tokens.TOC_CHAPTER_ITEM_MULTI_LINE_START
             continue
 
         if regex.TOC_CHAPTER_ITEM_RE_ONE_LINE.search(txt) is not None:
-            line['type'] = tokens.TOKEN_TOC_CHAPTER_ITEM_ONE_LINE
+            line['type'] = tokens.TOC_CHAPTER_ITEM_ONE_LINE
             continue

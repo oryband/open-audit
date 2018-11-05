@@ -6,27 +6,29 @@ These objects could then be stored in a database and eventually displayed on a w
 import sys
 
 from tokenize import tokenize
+import regex
 import tokens
 
 
 def group_tokens(tokenized_lines):
     """Iterate over tokenized lines and group them into token groups related to one another."""
     token_groups = []
-    for line in tokenized_lines:
-        typ, txt = line['type'], line['text']
-
-        if typ in [tokens.TOKEN_TOC_CHAPTER_NUMBER_WITH_TITLE_CONTINUE,
-                   tokens.TOKEN_TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE,
-                   tokens.TOKEN_CHAPTER_TOPIC_TITLE_CONTINUE,
-                   tokens.TOKEN_CHAPTER_TOPIC_DISCUSSED_OFFICES_CONTINUE,
-                   tokens.TOKEN_DEFECT_BODY_CONTINUE,
-                   tokens.TOKEN_DEFECT_REPLY_BODY_CONTINUE,
-                   ]:
-            token_groups[-1].append(line)
+    for tokenized_line in tokenized_lines:
+        # append lines which belong to the previous token to the previous token
+        # object. these are lines tokenized as "..._CONTINUE"
+        if tokenized_line['type'] in [tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_CONTINUE,
+                                      tokens.TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE,
+                                      tokens.CHAPTER_TOPIC_TITLE_CONTINUE,
+                                      tokens.CHAPTER_TOPIC_DISCUSSED_OFFICES_CONTINUE,
+                                      tokens.DEFECT_BODY_CONTINUE,
+                                      tokens.DEFECT_REPLY_BODY_CONTINUE,
+                                      ]:
+            token_groups[-1].append(tokenized_line)
 
             continue
 
-        token_groups.append([line])
+        # otherwise, create a new tokenized line object
+        token_groups.append([tokenized_line])
 
     return token_groups
 

@@ -80,10 +80,10 @@ def tokenize_chapter_office_names(tokenized_lines, office_names):
 
         txt = line['text'].strip()
         if txt in office_names:
-            if tokenized_lines[i-1]['type'] == tokens.TOKEN_DEFECT_REPLY_HEADER:
-                line['type'] = tokens.TOKEN_DEFECT_REPLY_OFFICE_NAME
+            if tokenized_lines[i-1]['type'] == tokens.DEFECT_REPLY_HEADER:
+                line['type'] = tokens.DEFECT_REPLY_OFFICE_NAME
             else:
-                line['type'] = tokens.TOKEN_CHAPTER_OFFICE_NAME
+                line['type'] = tokens.CHAPTER_OFFICE_NAME
 
 
 def tokenize_chapter_topic_discussed_offices(tokenized_lines):
@@ -104,11 +104,11 @@ def tokenize_chapter_topic_discussed_offices(tokenized_lines):
 
         txt = line['text'].strip()
         if regex.CHAPTER_TOPIC_DISCUSSED_OFFICES_RE.search(txt.strip()) is not None:
-            line['type'] = tokens.TOKEN_CHAPTER_TOPIC_DISCUSSED_OFFICES_START
+            line['type'] = tokens.CHAPTER_TOPIC_DISCUSSED_OFFICES_START
             continue
-        if tokenized_lines[i-1]['type'] in [tokens.TOKEN_CHAPTER_TOPIC_DISCUSSED_OFFICES_START,
-                                            tokens.TOKEN_CHAPTER_TOPIC_DISCUSSED_OFFICES_CONTINUE]:
-            line['type'] = tokens.TOKEN_CHAPTER_TOPIC_DISCUSSED_OFFICES_CONTINUE
+        if tokenized_lines[i-1]['type'] in [tokens.CHAPTER_TOPIC_DISCUSSED_OFFICES_START,
+                                            tokens.CHAPTER_TOPIC_DISCUSSED_OFFICES_CONTINUE]:
+            line['type'] = tokens.CHAPTER_TOPIC_DISCUSSED_OFFICES_CONTINUE
 
 
 def tokenize_defect_headers(tokenized_lines):
@@ -135,7 +135,7 @@ def tokenize_defect_headers(tokenized_lines):
             continue
 
         if regex.DEFECT_HEADER_RE.search(line['text']) is not None:
-            line['type'] = tokens.TOKEN_DEFECT_HEADER
+            line['type'] = tokens.DEFECT_HEADER
 
 
 # TODO tokenize office name which comes straight after a defect reply
@@ -164,7 +164,7 @@ def tokenize_reply_headers(tokenized_lines):
             continue
 
         if regex.DEFECT_REPLY_HEADER_RE.search(line['text']) is not None:
-            line['type'] = tokens.TOKEN_DEFECT_REPLY_HEADER
+            line['type'] = tokens.DEFECT_REPLY_HEADER
 
 
 def tokenize_chapter_numbers(tokenized_lines):
@@ -180,7 +180,7 @@ def tokenize_chapter_numbers(tokenized_lines):
             continue
 
         if regex.CHAPTER_NUMBER_RE.search(line['text']) is not None:
-            line['type'] = tokens.TOKEN_CHAPTER_NUMBER
+            line['type'] = tokens.CHAPTER_NUMBER
 
 
 # TODO after each chapter header (e.g. "פרק ראשןו") there's an optional chapter
@@ -220,11 +220,11 @@ def tokenize_chapter_topics(tokenized_lines, state_comptroller_defects):
         for defect in state_comptroller_defects:
             # ignore single words lines since they can create false positives
             if txt in defect and len(txt.split()) > 1:
-                if tokenized_lines[i-1]['type'] in [tokens.TOKEN_CHAPTER_TOPIC_TITLE_START,
-                                                    tokens.TOKEN_CHAPTER_TOPIC_TITLE_CONTINUE]:
-                    line['type'] = tokens.TOKEN_CHAPTER_TOPIC_TITLE_CONTINUE
+                if tokenized_lines[i-1]['type'] in [tokens.CHAPTER_TOPIC_TITLE_START,
+                                                    tokens.CHAPTER_TOPIC_TITLE_CONTINUE]:
+                    line['type'] = tokens.CHAPTER_TOPIC_TITLE_CONTINUE
                 else:
-                    line['type'] = tokens.TOKEN_CHAPTER_TOPIC_TITLE_START
+                    line['type'] = tokens.CHAPTER_TOPIC_TITLE_START
 
                 continue
 
@@ -244,12 +244,12 @@ def tokenize_defect_bodies(tokenized_lines):
             continue
 
         prev_line_type = tokenized_lines[i-1]['type']
-        if prev_line_type == tokens.TOKEN_DEFECT_HEADER:
-            line['type'] = tokens.TOKEN_DEFECT_BODY_START
+        if prev_line_type == tokens.DEFECT_HEADER:
+            line['type'] = tokens.DEFECT_BODY_START
             continue
-        if prev_line_type in [tokens.TOKEN_DEFECT_BODY_START,
-                              tokens.TOKEN_DEFECT_BODY_CONTINUE]:
-            line['type'] = tokens.TOKEN_DEFECT_BODY_CONTINUE
+        if prev_line_type in [tokens.DEFECT_BODY_START,
+                              tokens.DEFECT_BODY_CONTINUE]:
+            line['type'] = tokens.DEFECT_BODY_CONTINUE
 
 
 def tokenize_defect_reply_bodies(tokenized_lines):
@@ -276,13 +276,13 @@ def tokenize_defect_reply_bodies(tokenized_lines):
 
         prev_line_type = tokenized_lines[i-1]['type']
 
-        if prev_line_type in [tokens.TOKEN_DEFECT_REPLY_HEADER,
-                              tokens.TOKEN_DEFECT_REPLY_OFFICE_NAME]:
-            line['type'] = tokens.TOKEN_DEFECT_REPLY_BODY_START
+        if prev_line_type in [tokens.DEFECT_REPLY_HEADER,
+                              tokens.DEFECT_REPLY_OFFICE_NAME]:
+            line['type'] = tokens.DEFECT_REPLY_BODY_START
             continue
-        if prev_line_type in [tokens.TOKEN_DEFECT_REPLY_BODY_START,
-                              tokens.TOKEN_DEFECT_REPLY_BODY_CONTINUE]:
-            line['type'] = tokens.TOKEN_DEFECT_REPLY_BODY_CONTINUE
+        if prev_line_type in [tokens.DEFECT_REPLY_BODY_START,
+                              tokens.DEFECT_REPLY_BODY_CONTINUE]:
+            line['type'] = tokens.DEFECT_REPLY_BODY_CONTINUE
 
 
 def tokenize(lines, alternative_office_names_path, state_comptroller_preface_path):
