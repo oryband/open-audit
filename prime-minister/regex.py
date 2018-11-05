@@ -1,6 +1,9 @@
 """Regular expressions for tokenizing documents."""
 import re
 
+REGEX_GROUP_TOC_CHAPTER_NUMBER = 'chapter_number'
+REGEX_GROUP_TEXT = 'text'
+
 # regex for detecting TOC opening header "תוכן העניינים"
 # allowing for some missing redundant characters and padding spaces
 TOC_HEADER_RE = re.compile(r'^\s*תוכן [ה]?עני[י]?נים\s*$')
@@ -18,7 +21,8 @@ TOC_BORDER_IDENTIFIER_SUMMARY_RE = re.compile(r'^\s*(?:תקציר\s+.*|תקצי�
 # WITHOUT any following title, for example:
 #
 # פרק שני
-TOC_CHAPTER_NUMBER_RE = re.compile(r'^\s*(פרק\s+\w+)\s*$')
+TOC_CHAPTER_NUMBER_RE = re.compile(r'^\s*פרק\s+(?P<{}>\w+)\s*$'.format(REGEX_GROUP_TOC_CHAPTER_NUMBER))
+
 
 # regexes for detecting a TOC chapter number and a following title and number, for example:
 #
@@ -39,13 +43,13 @@ TOC_CHAPTER_NUMBER_RE = re.compile(r'^\s*(פרק\s+\w+)\s*$')
 # - fetch all office names from state-comptroller output files,
 #   and in addition construct a common office alternative names e.g. משרד הבטחון | משרד הב_י_טחון
 #   then tokenize them second (as offices)
-TOC_CHAPTER_NUMBER_WITH_TITLE_RE = re.compile(r'^\s*(פרק\s+\w+)\s+-\s+(.+)$')
+TOC_CHAPTER_NUMBER_WITH_TITLE_RE = re.compile(r'^\s*פרק\s+(?P<{}>\w+)\s+-\s+(?P<{}>.+)$'.format(REGEX_GROUP_TOC_CHAPTER_NUMBER, REGEX_GROUP_TEXT))
 
 # regex for detecting a special TOC chapter number with title
 # that does NOT have an office name in the following line
 #
-# used for catching speciall chapter discussin cross-office subjects (מטלות רוחב)
-TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE_RE = re.compile(r'^\s*(פרק\s+\w+)\s+-\s+(מטלות רוחב(?:$|\s+.+))$')
+# used for catching speciall chapter discussing cross-office subjects (מטלות רוחב)
+TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE_RE = re.compile(r'^\s*פרק\s+(?P<{}>\w+)\s+-\s+(?P<{}>מטלות רוחב(?:$|\s+.+))$'.format(REGEX_GROUP_TOC_CHAPTER_NUMBER, REGEX_GROUP_TEXT))
 
 # regex for detecting a TOC chapter office, for example:
 # פרק חמישי - מוסדות המדינה, חברות ממשלתיות
@@ -55,7 +59,7 @@ TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE_RE = re.compile(r'^\s*(פרק\s+\w+)\
 # הרשות להגנת הצרכן ולסחר הוגן והמועצה הישראלית לצרכנות  <--- THIS
 #
 # 1.  פעילות הרשות להגנת הצרכן ולסחר הוגן והמועצה הישראלית לצרכנות...151
-TOC_CHAPTER_OFFICE_RE = re.compile(r'^\s*(.*)\s*$')
+TOC_CHAPTER_OFFICE_RE = re.compile(r'^\s*(?P<{}>.*)\s*$'.format(REGEX_GROUP_TEXT))
 
 # regex for detecting a TOC item in the form of:
 #
@@ -65,8 +69,8 @@ TOC_CHAPTER_OFFICE_RE = re.compile(r'^\s*(.*)\s*$')
 #
 # NOTE we're ignoring the multiple dots and page number, and taking just the
 # text.
-TOC_CHAPTER_ITEM_RE_ONE_LINE = re.compile(r'^\s*(?:\d+\.\s+)??(.+?)\s*(?:\d+)$')
-TOC_CHAPTER_ITEM_RE_MULTI_LINE_START = re.compile(r'^\s*(?:\d+\.\s+)??(.+?)(?<!\d)\s*$')
+TOC_CHAPTER_ITEM_RE_ONE_LINE = re.compile(r'^\s*(?:\d+\.\s+)??(?P<{}>.+?)\s*(?:\d+)$'.format(REGEX_GROUP_TEXT))
+TOC_CHAPTER_ITEM_RE_MULTI_LINE_START = re.compile(r'^\s*(?:\d+\.\s+)??(?P<{}>.+?)(?<!\d)\s*$'.format(REGEX_GROUP_TEXT))
 TOC_CHAPTER_ITEM_RE_MULTI_LINE_END = TOC_CHAPTER_ITEM_RE_ONE_LINE
 
 # regex for joining TOC items which are split across multiple lines.
