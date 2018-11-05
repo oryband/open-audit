@@ -1,4 +1,8 @@
 """Token definition used by tokenize and toc modules."""
+# ******************************************************************
+# Tokens for tokenized lines, prior to processing into token objects
+# ******************************************************************
+
 # table of contents
 #
 # TODO TOKEN_TOC_CHAPTER_TITLE_START includes TOKEN_TOC_CHAPTER_NUMBER
@@ -41,3 +45,9 @@ DEFECT_REPLY_HEADER = 'TOKEN_DEFECT_REPLY_HEADER'
 DEFECT_REPLY_OFFICE_NAME = 'TOKEN_DEFECT_REPLY_OFFICE_NAME'
 DEFECT_REPLY_BODY_START = 'TOKEN_DEFECT_REPLY_BODY_START'
 DEFECT_REPLY_BODY_CONTINUE = 'TOKEN_DEFECT_REPLY_BODY_CONTINUE'
+
+# ******************
+# Token object types
+# ******************
+
+OBJ_TOC_CHAPTER = 'TOKEN_OBJ_CHAPTER'

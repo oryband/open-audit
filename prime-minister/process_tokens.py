@@ -34,15 +34,65 @@ def group_tokens(tokenized_lines):
 
 
 def text_objects_from_token_groups(token_groups):
-    current_chapter, current_topic = None, None
-    for token_group in token_groups:
-        first_token_type = token_group[0]['type']
-        first_token_text = token_group[0]['text']
+    """Iterate over token groups, categorize them into tokens and turn them into dictionaries.
 
-        if first_token_type == tokens.TOKEN_CHAPTER_NUMBER:
-            chapter_number_text = first_token_text.split()[1]
-            chapter_number = chapter_text_to_number(chapter_number_text)
-            print(chapter_number)
+    Tokens in a single group can be (for example) the chapter number and chapter text.
+    """
+    for token_group in token_groups:
+        # initialize new token object
+        token_obj = {'type': None, 'text': ""}
+        match = None
+
+        # first tokenized line in every token group has special information
+        # that needs to be extracted e.g. chapter number from a line that start
+        # with the number and continues with the chapter text
+        first_type = token_group[0]['type']
+        first_text = token_group[0]['text']
+        if first_type in [tokens.CHAPTER_NUMBER,
+                          tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_START,
+                          tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE]:
+
+            if first_type == tokens.CHAPTER_NUMBER:
+                match = regex.TOC_CHAPTER_NUMBER_RE.search(first_text)
+            elif first_type == tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_START:
+                match = regex.TOC_CHAPTER_NUMBER_WITH_TITLE_RE.search(first_text)
+            elif first_type == tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE:
+                match = regex.TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE_RE.search(first_text)
+
+            # fetch chapter number and remember it
+            chapter_number_text = match.group(regex.REGEX_GROUP_TOC_CHAPTER_NUMBER)
+
+            current_chapter = chapter_text_to_number(chapter_number_text)
+            print('set chapter number to "{}"'.format(current_chapter))
+            token_obj['type'] = tokens.OBJ_TOC_CHAPTER
+
+        # iterate all tokenized lines in group and construct the token object
+        for tokenized_line in token_group:
+            typ, txt = tokenized_line['type'], tokenized_line['text']
+
+            # append lines which belong to the previous token to the previous token
+            # object. these are lines tokenized as "..._CONTINUE"
+            if typ in [tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_CONTINUE,
+                       tokens.TOC_CHAPTER_ITEM_MULTI_LINE_CONTINUE,
+                       tokens.CHAPTER_TOPIC_TITLE_CONTINUE,
+                       tokens.CHAPTER_TOPIC_DISCUSSED_OFFICES_CONTINUE,
+                       tokens.DEFECT_BODY_CONTINUE,
+                       tokens.DEFECT_REPLY_BODY_CONTINUE,
+                       ]:
+                token_obj['text'] += txt
+
+                continue
+
+            if typ == tokens.TOC_CHAPTER_NUMBER:
+                continue
+            elif typ == tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_START:
+                token_obj['text'] = regex.TOC_CHAPTER_NUMBER_WITH_TITLE_RE.search(txt).group(regex.REGEX_GROUP_TEXT)
+            elif typ == tokens.TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE:
+                token_obj['text'] = regex.TOC_CHAPTER_NUMBER_WITH_TITLE_CROSS_OFFICE_RE.search(txt).group(regex.REGEX_GROUP_TEXT)
+            elif typ == tokens.TOC_CHAPTER_OFFICE:
+                token_obj['text'] = regex.TOC_CHAPTER_OFFICE_RE.search(txt).group(regex.REGEX_GROUP_TEXT)
+            elif typ == tokens.TOC_CHAPTER_ITEM_ONE_LINE:
+                token_obj['text'] = regex.TOC_CHAPTER_ITEM_RE_ONE_LINE.search(txt).group(regex.REGEX_GROUP_TEXT)
 
 
 def chapter_text_to_number(text):
