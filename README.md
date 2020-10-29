@@ -1,3 +1,7 @@
+# DEPRECATED
+
+I have abandoned this project and it is no longer in development. Here for documentation purposes only.
+
 # Open Audit
 
 Opening the Israeli state comptroller and other auditing data, one step at a time. ![Inspector][inspector image]
